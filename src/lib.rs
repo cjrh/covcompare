@@ -25,35 +25,53 @@ pub fn compare(base: PathBuf, comp: PathBuf) -> (usize, String) {
 
     let mut msgs: Vec<String> = Vec::new();
     let mut code: usize = 1;
+    code = 0;
 
     let nolinechange = (base_result.line - comp_result.line).abs() < 0.01;
     let nobranchchange = (base_result.branch - comp_result.branch).abs() < 0.01;
 
     if nolinechange & nobranchchange {
         msgs.push(format!(
-            "Coverage remained acceptable, at {} line and {} branch",
+            "Coverage remained about the same, at {} line and {} branch",
             comp_result.line, comp_result.branch,
         ));
-        code = 0;
     } else {
         if base_result.line > comp_result.line {
             msgs.push(format!(
-                "Line coverage dropped from {:.3} to {:.3} ({:.3})",
+                "Line coverage dropped from {:.3} to {:.3} ({:+.3})",
                 base_result.line,
                 comp_result.line,
                 comp_result.line - base_result.line
             ));
+            code = 1;
         }
         if base_result.branch > comp_result.branch {
             msgs.push(format!(
-                "Branch coverage dropped from {:.3} to {:.3} ({:.3})",
+                "Branch coverage dropped from {:.3} to {:.3} ({:+.3})",
                 base_result.branch,
                 comp_result.branch,
                 comp_result.branch - base_result.branch
             ));
             code = 1;
         }
+        if comp_result.line > base_result.line {
+            msgs.push(format!(
+                "Line coverage improved from {:.3} to {:.3} ({:+.3})",
+                base_result.line,
+                comp_result.line,
+                base_result.line - comp_result.line,
+            ));
+        }
+        if comp_result.branch > base_result.line {
+            msgs.push(format!(
+                "Branch coverage improved from {:.3} to {:.3} ({:+.3})",
+                base_result.branch,
+                comp_result.branch,
+                comp_result.line - base_result.line,
+            ));
+        }
     }
+
     (code, msgs.join("; "))
 }
 
