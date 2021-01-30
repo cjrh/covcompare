@@ -48,7 +48,7 @@ pub fn compare(base: PathBuf, comp: PathBuf) -> (usize, String) {
                 "Line coverage improved from {:.3} to {:.3} ({:+.3})",
                 base_result.line,
                 comp_result.line,
-                base_result.line - comp_result.line,
+                comp_result.line - base_result.line
             ));
         }
 
