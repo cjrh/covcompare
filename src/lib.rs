@@ -7,7 +7,7 @@ struct Coverage {
     branch: f64,
 }
 
-pub fn compare(base: PathBuf, comp: PathBuf) -> (usize, String) {
+pub fn compare(base: PathBuf, comp: PathBuf, tolerance: f64) -> (usize, String) {
     // println!("File 1: {:?}", &base);
     // println!("File 2: {:?}", &comp);
 
@@ -24,53 +24,40 @@ pub fn compare(base: PathBuf, comp: PathBuf) -> (usize, String) {
     let comp_result = comp_result.unwrap();
 
     let mut msgs: Vec<String> = Vec::new();
-    let mut code: usize = 0;
 
-    let nolinechange = (base_result.line - comp_result.line).abs() < 0.01;
-    let nobranchchange = (base_result.branch - comp_result.branch).abs() < 0.01;
+    let report_line = format!(
+        "from {:.3} to {:.3} ({:+.3})",
+        base_result.line,
+        comp_result.line,
+        comp_result.line - base_result.line
+    );
 
-    if nolinechange & nobranchchange {
-        msgs.push(format!(
-            "Coverage remained about the same, at {} line and {} branch",
-            comp_result.line, comp_result.branch,
-        ));
-    } else {
-        if base_result.line > comp_result.line {
-            msgs.push(format!(
-                "Line coverage dropped from {:.3} to {:.3} ({:+.3})",
-                base_result.line,
-                comp_result.line,
-                comp_result.line - base_result.line
-            ));
-            code = 1;
-        } else {
-            msgs.push(format!(
-                "Line coverage improved from {:.3} to {:.3} ({:+.3})",
-                base_result.line,
-                comp_result.line,
-                comp_result.line - base_result.line
-            ));
-        }
+    let report_branch = format!(
+        "from {:.3} to {:.3} ({:+.3})",
+        base_result.branch,
+        comp_result.branch,
+        comp_result.branch - base_result.branch,
+    );
 
-        if base_result.branch > comp_result.branch {
-            msgs.push(format!(
-                "Branch coverage dropped from {:.3} to {:.3} ({:+.3})",
-                base_result.branch,
-                comp_result.branch,
-                comp_result.branch - base_result.branch
-            ));
-            code = 1;
-        } else {
-            msgs.push(format!(
-                "Branch coverage improved from {:.3} to {:.3} ({:+.3})",
-                base_result.branch,
-                comp_result.branch,
-                comp_result.line - base_result.line,
-            ));
-        }
-    }
+    let line_ok = (comp_result.line - base_result.line) > -tolerance;
+    let branch_ok = (comp_result.branch - base_result.branch) > -tolerance;
 
-    (code, msgs.join("; "))
+    let line_symbol = if line_ok { "✅" } else { "❌" };
+
+    let branch_symbol = if branch_ok { "✅" } else { "❌" };
+
+    msgs.push(format!(
+        "Line coverage changed {} {}",
+        report_line, line_symbol
+    ));
+    msgs.push(format!(
+        "Branch coverage changed {} {}",
+        report_branch, branch_symbol
+    ));
+
+    let code = if line_ok & branch_ok { 0 } else { 1 };
+
+    (code, msgs.join("\n"))
 }
 
 fn extract(file: &PathBuf) -> Option<Coverage> {
