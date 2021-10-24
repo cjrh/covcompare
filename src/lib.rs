@@ -82,7 +82,6 @@ fn extract(file: &PathBuf) -> Option<Coverage> {
                         branch: 0.0,
                     };
                     attributes.iter().for_each(|a| {
-                        // println!("    {}", &a);
                         if a.name.local_name == "line-rate" {
                             result.line = a.value.parse().unwrap();
                         } else if a.name.local_name == "branch-rate" {
@@ -134,7 +133,7 @@ mod tests {
     #[test]
     fn test_add() {
         let expected = make_expected(9, "msg");
-        let result = compare(PathBuf::from("a.xml"), PathBuf::from("b.xml"));
+        let result = compare(PathBuf::from("a.xml"), PathBuf::from("b.xml"), 0.002);
         assert_eq!(result.0, 9);
     }
 
@@ -162,7 +161,7 @@ mod tests {
     #[test]
     fn test_compare_base_no_comp() -> Result<(), String> {
         let (f1, f2) = same_files();
-        let result = compare(f1, PathBuf::from("thisfiledoesntexist.xml"));
+        let result = compare(f1, PathBuf::from("thisfiledoesntexist.xml"), 0.002);
         assert_eq!(result.0, 8);
         Ok(())
     }
@@ -170,7 +169,7 @@ mod tests {
     #[test]
     fn test_compare_same() -> Result<(), String> {
         let (f1, f2) = same_files();
-        let result = compare(f1, f2);
+        let result = compare(f1, f2, 0.002);
         assert_eq!(result.0, 0);
         // assert_eq!(result.1, "");
         Ok(())
@@ -179,7 +178,7 @@ mod tests {
     #[test]
     fn test_compare_different() -> Result<(), String> {
         let (f1, f2) = different_files();
-        let result = compare(f1, f2);
+        let result = compare(f1, f2, 0.002);
         println!("{:?}", &result);
         assert_eq!(result.0, 1);
         // assert_eq!(result.1, "");
