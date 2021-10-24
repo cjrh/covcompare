@@ -1,3 +1,4 @@
+use covcompare::compare;
 use std::path::PathBuf;
 
 // With the "paw" feature enabled in structopt
@@ -37,7 +38,7 @@ struct Args {
 
 #[paw::main]
 fn main(args: Args) -> Result<(), std::io::Error> {
-    let (exit_code, msg) = covcompare::compare(args.baseline, args.change, args.tolerance);
+    let (exit_code, msg) = compare(args.baseline, args.change, args.tolerance);
     eprintln!("{}", msg);
     std::process::exit(exit_code as i32);
     // Ok(())
