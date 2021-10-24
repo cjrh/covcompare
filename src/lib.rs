@@ -39,8 +39,8 @@ pub fn compare(base: PathBuf, comp: PathBuf, tolerance: f64) -> (usize, String) 
         comp_result.branch - base_result.branch,
     );
 
-    let line_ok = (comp_result.line - base_result.line) > -tolerance;
-    let branch_ok = (comp_result.branch - base_result.branch) > -tolerance;
+    let line_ok = (comp_result.line - base_result.line) >= -tolerance;
+    let branch_ok = (comp_result.branch - base_result.branch) >= -tolerance;
 
     let line_symbol = if line_ok { "✅" } else { "❌" };
 
