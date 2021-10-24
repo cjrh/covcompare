@@ -7,8 +7,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-structopt = { version = "0.3.21", features = [ "paw" ] }
+structopt = { version = "0.3.25", features = [ "paw" ] }
 paw = "1.0.0"
-xml-rs = "0.8.3"
+xml-rs = "0.8.4"
 
 # https://github.com/cjrh/covcompare/releases/latest/download/covcompare
