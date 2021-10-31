@@ -7,6 +7,13 @@ struct Coverage {
     branch: f64,
 }
 
+impl Coverage {
+    fn trunc(&mut self) {
+        self.line = f64::trunc(self.line * 1000.0) / 1000.0;
+        self.branch = f64::trunc(self.branch * 1000.0) / 1000.0;
+    }
+}
+
 pub fn compare(base: PathBuf, comp: PathBuf, tolerance: f64) -> (usize, String) {
     // println!("File 1: {:?}", &base);
     // println!("File 2: {:?}", &comp);
@@ -15,13 +22,15 @@ pub fn compare(base: PathBuf, comp: PathBuf, tolerance: f64) -> (usize, String) 
     if base_result.is_none() {
         return (9, "No base result for comparison".to_owned());
     }
-    let base_result = base_result.unwrap();
+    let mut base_result = base_result.unwrap();
+    base_result.trunc();
 
     let comp_result = extract(&comp);
     if comp_result.is_none() {
         return (8, "Nothing found to compare".to_owned());
     }
-    let comp_result = comp_result.unwrap();
+    let mut comp_result = comp_result.unwrap();
+    comp_result.trunc();
 
     let mut msgs: Vec<String> = Vec::new();
 
